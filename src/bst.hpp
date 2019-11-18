@@ -43,6 +43,7 @@ private:
     // the number of nodes in the tree
     int node_count;
     void inorderHelper(std::vector<T>*, Node<T>*);
+    Node<T>* insertHelper(int, Node<T>*);
 };
 
 
@@ -76,8 +77,8 @@ std::vector<T> * BST<T>::inorder()
 template<class T>
 void BST<T>::inorderHelper(std::vector<T>* vec, Node<T>* currentNode)
 {
-    if(currentNode != NULL)
-    {
+    if(currentNode != NULL) {
+    
         inorderHelper(vec, currentNode->get_left());   
         vec->push_back(currentNode->get_data());      
         inorderHelper(vec, currentNode->get_right()); 
@@ -103,9 +104,27 @@ template<class T>
 template<class T>
 void BST<T>::insert(T new_data)
 {
-
+    root = insertHelper(new_data, root); //insert new data into bst recuservily
+    node_count++;
 }
 
+template<class T>
+Node<T>* BST<T>::insertHelper(int new_data, Node<T>* currentNode)
+{
+    if(currentNode == NULL)
+    {   
+        return new Node<T>(new_data);
+    }
+    else if(new_data < currentNode->get_data()) {
+    
+        currentNode->set_left(insertHelper(new_data, currentNode->get_left())); // move data left
+    }
+    else
+    {
+        currentNode->set_right(insertHelper(new_data, currentNode->get_right())); //move data right
+    }
+    return currentNode;    
+}
 
 template<class T>
 Node<T> *BST<T>::search(T val)
