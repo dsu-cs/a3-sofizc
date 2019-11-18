@@ -223,10 +223,10 @@ Node<T>* BST<T>::removeHelper(T key, Node<T>* currentNode) // honestly had no id
                     removeHelper(suc->get_data(), root);
                     currentNode->set_data(sucData);
                     remove = currentNode;
-                    /*delete(currentNode);*/
+                    delete(remove);
                 }
             }
-            return remove;
+            return currentNode;
             
 
         } else if (currentNode->get_data() < key) {
@@ -239,7 +239,7 @@ Node<T>* BST<T>::removeHelper(T key, Node<T>* currentNode) // honestly had no id
         }
     }
 
-    return NULL;
+    return currentNode;
 }
 
 
