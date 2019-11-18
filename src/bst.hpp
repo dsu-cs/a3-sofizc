@@ -44,6 +44,10 @@ private:
     int node_count;
     void inorderHelper(std::vector<T>*, Node<T>*);
     Node<T>* insertHelper(int, Node<T>*);
+    void preorderHelper(std::vector<T>*, Node<T>*);
+    void postorderHelper(std::vector<T>*, Node<T>*);
+    Node<T>* searchHelper(T, Node<T>*);
+    Node<T>* removeHelper(T, Node<T>*);
 };
 
 
@@ -89,16 +93,37 @@ template<class T>
  std::vector<T> * BST<T>::preorder()
 {
     std::vector<T> *vec = new std::vector<T>;
+    preorderHelper(vec, root);
     return vec;
 }
 
+template<class T>
+void BST<T>::preorderHelper(std::vector<T>* vec, Node<T>* currentNode)
+{
+    if(currentNode != NULL) {
+        vec->push_back(currentNode->get_data());      
+        preorderHelper(vec, currentNode->get_left());  
+        preorderHelper(vec, currentNode->get_right()); 
+    }
+}
 
 template<class T>
  std::vector<T> * BST<T>::postorder()
 {
     std::vector<T> *vec = new std::vector<T>;
-
+    postorderHelper(vec, root);
     return vec;
+}
+
+template<class T>
+void BST<T>::postorderHelper(std::vector<T>* vec, Node<T>* currentNode)
+{
+  if(currentNode != NULL) {
+    
+        postorderHelper(vec, currentNode->get_left());     
+        postorderHelper(vec, currentNode->get_right());    
+        vec->push_back(currentNode->get_data());          
+    }
 }
 
 template<class T>
@@ -129,15 +154,92 @@ Node<T>* BST<T>::insertHelper(int new_data, Node<T>* currentNode)
 template<class T>
 Node<T> *BST<T>::search(T val)
 {
-
+    return searchHelper(val, root);
 }
 
+template<class T>
+Node<T>* BST<T>::searchHelper(T key, Node<T>* currentNode) {
+    if (currentNode == NULL) {
+        return currentNode;
+    } else if (key < currentNode->get_data()) //left subtree 
+    {
+        return searchHelper(key, currentNode->get_left());
+    } else if (key > currentNode->get_data()) //right subtree
+    {
+        return searchHelper(key, currentNode->get_right());
+    }
+    
+    return currentNode;
+}
 
 
 template<class T>
 void BST<T>::remove(T val)
 {
+    root = removeHelper(val, root);
+}
 
+template<class T>
+Node<T>* BST<T>::removeHelper(T key, Node<T>* currentNode) // honestly had no idea how to implement this one, but fixed the seg fault!
+{
+    Node<T>* par = NULL;
+    Node<T>* suc = NULL;
+    Node<T>* remove = NULL;
+    int sucData;
+    while(currentNode != NULL) {
+        if(currentNode->get_data() == key) {
+            if (!currentNode->get_left() && !currentNode->get_right()) { //remove leaf
+                if (!par) {
+                    root = NULL;
+                } else if (par->get_left() == currentNode) {
+                    par->set_left(NULL);
+                } else {
+                    par->set_right(NULL);
+                }
+            } else if (currentNode->get_left() && !currentNode->get_right()) {
+                //remove node with only left child
+                if (!par) {
+                    root = currentNode->get_left();
+                } else if (par->get_left() == currentNode) {
+                    par->set_left(currentNode->get_left());
+                } else {
+                    par->set_right(currentNode->get_left());
+                }
+            } else if (!currentNode->get_left() && currentNode->get_right()) {
+                //remov node with onily right child
+                if (!par) {
+                    root = currentNode->get_right();
+                } else if (par->get_left() == currentNode) {
+                    par->set_left(currentNode->get_right());
+                } else {
+                    par->set_right(currentNode->get_right());
+                }
+            } else {
+                //remove node with two children
+                suc = currentNode->get_right();
+                while (suc->get_left() != NULL) {
+                    suc = suc->get_left();
+                    sucData = suc->get_data();
+                    removeHelper(suc->get_data(), root);
+                    currentNode->set_data(sucData);
+                    remove = currentNode;
+                    /*delete(currentNode);*/
+                }
+            }
+            return remove;
+            
+
+        } else if (currentNode->get_data() < key) {
+            //search right
+            par = currentNode;
+            currentNode = currentNode->get_right();
+        } else {
+            par = currentNode;
+            currentNode = currentNode->get_left();
+        }
+    }
+
+    return NULL;
 }
 
 
