@@ -3,7 +3,9 @@
 // include this library to use NULL, otherwise use nullptr instead
 #include <cstddef>
 #include <iostream>
+#include <vector>
 #include "node.hpp"
+using namespace std;
 
 template<class T>
 class BST{
@@ -23,10 +25,10 @@ public:
     std::vector<T> *inorder(void);
     // Performs an postorder traversal
     // returns: pointer to a vector containing the tree traversal
-    std::vector<T> *postorder(void);
+    std::vector<T> *preorder(void);
     // Performs an preorder traversal
     // returns: pointer to a vector containing the tree traversal
-    std::vector<T> *preorder(void);
+    std::vector<T> *postorder(void);
     // Searches the tree for a given value
     // param: the data to search for
     // returns: a pointer to the node containing the data or NULL if the data
@@ -40,7 +42,9 @@ private:
     Node<T> *root;
     // the number of nodes in the tree
     int node_count;
+    void inorderHelper(std::vector<T>*, Node<T>*);
 };
+
 
 template<class T>
 BST<T>::BST()
@@ -48,6 +52,7 @@ BST<T>::BST()
     root = NULL;
     node_count = 0;
 }
+
 
 template<class T>
 BST<T>::~BST()
@@ -60,13 +65,24 @@ BST<T>::~BST()
 }
 
 template<class T>
- std::vector<T> * BST<T>::inorder()
+std::vector<T> * BST<T>::inorder()
 {
-    std::vector<T> *vec = new std::vector<T>;
-
+    std::vector<T> *vec = new std::vector<T>;   
+    inorderHelper(vec, root);
     return vec;
 }
 
+//fuction to assist with calls, since can't pass node into inorder function
+template<class T>
+void BST<T>::inorderHelper(std::vector<T>* vec, Node<T>* currentNode)
+{
+    if(currentNode != NULL)
+    {
+        inorderHelper(vec, currentNode->get_left());   
+        vec->push_back(currentNode->get_data());      
+        inorderHelper(vec, currentNode->get_right()); 
+    }
+}
 
 template<class T>
  std::vector<T> * BST<T>::preorder()
@@ -110,5 +126,5 @@ void BST<T>::remove(T val)
 template<class T>
 int BST<T>::get_size()
 {
-
+    return node_count;
 }
